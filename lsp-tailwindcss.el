@@ -40,22 +40,11 @@
   :type 'boolean
   :group 'lsp-tailwindcss)
 
-(defcustom lsp-tailwindcss-server-version "0.9.11"
-  "Specify the version of tailwindcss intellisence."
-  :type 'string
-  :group 'lsp-tailwindcss)
-
 (defcustom lsp-tailwindcss-major-modes '(rjsx-mode web-mode html-mode css-mode typescript-mode typescript-tsx-mode tsx-ts-mode)
   "Major modes that lsp-tailwindcss should activate."
   :type 'list
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
-
-(defcustom lsp-tailwindcss-rustywind-command (executable-find "rustywind")
-  "[Experimental] Command use for sort the tailwindcss classes."
-  :type 'string
-  :group 'lsp-tailwindcss
-  :package-version '(lsp-tailwindcss . "0.3"))
 
 (defcustom lsp-tailwindcss-skip-config-check nil
   "Force skip config file check.
@@ -64,51 +53,6 @@ and make sure tailwindcss language server can find it."
   :type 'boolean
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.3"))
-
-;;;###autoload
-(defun lsp-tailwindcss-rustywind ()
-  "[Experimental] Sort tailwindcss class name using rustywind.
-This is an *experimental* feature, please be careful when use."
-  (interactive)
-  (if (and lsp-tailwindcss-rustywind-command
-           (f-executable-p lsp-tailwindcss-rustywind-command))
-    (let ((tmpfile (make-nearby-temp-file "rustywind" nil nil))
-          (coding-system-for-read 'utf-8)
-          (coding-system-for-write 'utf-8))
-
-      (unwind-protect
-          (save-restriction
-            (widen)
-            (write-region nil nil tmpfile)
-
-            (let ((rustywind-args (list "--write" (file-local-name tmpfile))))
-              (when (zerop (apply #'process-file lsp-tailwindcss-rustywind-command nil nil nil rustywind-args))
-                (insert-file-contents tmpfile nil nil nil t))))
-
-        (delete-file tmpfile)))
-    (error (format "Can't find rustywind executable at %s" lsp-tailwindcss-rustywind-command))))
-
-;;;###autoload
-(defun lsp-tailwindcss-rustywind-before-save()
-  "[Experimental] Run rustywind when saving buffer.
-By add this to `before-save-hook',
-it only runs when lsp-tailwindcss can be activated,
-see `lsp-tailwindcss--activate-p'.
-This is an *experimental* feature, please use it carefully."
-  (when (lsp-tailwindcss--activate-p)
-    (lsp-tailwindcss-rustywind)))
-
-;;;###autoload
-(defun lsp-tailwindcss-installed-server-version()
-  "[Experimental] Get the installed version of tailwindcss language server."
-  (interactive)
-  (let ((package-json-file (f-join lsp-server-install-dir "tailwindcss/extension/package.json")))
-    (if (f-exists? package-json-file)
-        (let ((json-object-type 'hash-table)
-              (json-array-type 'list)
-              (json-key-type 'string))
-          (message "%s" (gethash "version" (json-read-file package-json-file))))
-      (error "Can't find package.json file at %s" package-json-file))))
 
 ;;; Language server global settings:
 (defcustom lsp-tailwindcss-emmet-completions nil
@@ -125,7 +69,7 @@ For example div.bg-red-500.uppercase."
   :package-version '(lsp-tailwindcss . "0.2"))
 
 (defcustom lsp-tailwindcss-root-font-size 16
- "Root font size in pixels.
+  "Root font size in pixels.
 Used to convert rem CSS values to their px equivalents,
  see `lsp-tailwindcss-show-pixel-equivalents'"
   :type 'number
@@ -163,40 +107,40 @@ Rules can be configured individually using the lsp-tailwindcss-lint-* settings:
 (defcustom lsp-tailwindcss-lint-invalid-screen "error"
   "Unknown screen name used with the @screen directive."
   :type '(choice (const "ignore")
-                 (const "warning")
-                 (const "error"))
+          (const "warning")
+          (const "error"))
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
 
 (defcustom lsp-tailwindcss-lint-invalid-variant "error"
   "Unknown variant name used with the @variants directive."
   :type '(choice (const "ignore")
-                 (const "warning")
-                 (const "error"))
+          (const "warning")
+          (const "error"))
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
 
 (defcustom lsp-tailwindcss-lint-invalid-tailwind-directive "error"
   "Unknown value used with the @tailwind directive."
   :type '(choice (const "ignore")
-                 (const "warning")
-                 (const "error"))
+          (const "warning")
+          (const "error"))
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
 
 (defcustom lsp-tailwindcss-lint-invalid-apply "error"
   "Unsupported use of the @apply directive."
   :type '(choice (const "ignore")
-                 (const "warning")
-                 (const "error"))
+          (const "warning")
+          (const "error"))
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
 
 (defcustom lsp-tailwindcss-lint-invalid-config-path "error"
   "Unknown or invalid path used with the theme helper."
   :type '(choice (const "ignore")
-                 (const "warning")
-                 (const "error"))
+          (const "warning")
+          (const "error"))
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
 
@@ -204,16 +148,16 @@ Rules can be configured individually using the lsp-tailwindcss-lint-* settings:
   "Class names on the same HTML element.
 Which apply the same CSS property or properties."
   :type '(choice (const "ignore")
-                 (const "warning")
-                 (const "error"))
+          (const "warning")
+          (const "error"))
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
 
 (defcustom lsp-tailwindcss-lint-recommended-variant-order "warning"
   "Class variants not in the recommended order (applies in JIT mode only)."
   :type '(choice (const "ignore")
-                 (const "warning")
-                 (const "error"))
+          (const "warning")
+          (const "error"))
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
 
@@ -266,17 +210,6 @@ Example:
    ("tailwindCSS.classAttributes" lsp-tailwindcss-class-attributes)))
 ;;; Language server global settings ends here
 
-(defun lsp-tailwindcss--download-url ()
-  "Build langauge server download url from version."
-  (let ((version lsp-tailwindcss-server-version))
-    (format "https://github.com/tailwindlabs/tailwindcss-intellisense/releases/download/v%s/vscode-tailwindcss-%s.vsix"
-            version version)))
-
-(defun lsp-tailwindcss-server-command ()
-  "The command to start the language server.
-When installed from the vscode extension."
-  (f-join lsp-server-install-dir "tailwindcss/extension/dist/tailwindServer.js"))
-
 (lsp-dependency 'tailwindcss-language-server
                 '(:system "tailwindcss-language-server")
                 '(:npm
@@ -299,13 +232,14 @@ see `lsp-tailwindcss-skip-config-check'"
       (file-exists-p (f-join (lsp-workspace-root) "assets" "tailwind.config.cjs"))
       (locate-dominating-file (buffer-file-name) "tailwind.config.cjs")
 
-     (file-exists-p (f-join (lsp-workspace-root) "tailwind.config.ts"))
+      (file-exists-p (f-join (lsp-workspace-root) "tailwind.config.ts"))
       (file-exists-p (f-join (lsp-workspace-root) "config" "tailwind.config.ts"))
       (file-exists-p (f-join (lsp-workspace-root) "assets" "tailwind.config.ts"))
       (locate-dominating-file (buffer-file-name) "tailwind.config.ts")))
 
 (defun lsp-tailwindcss--activate-p (&rest _args)
   "Check if tailwindcss language server can/should start."
+  (message (lsp-workspace-root))
   (and (lsp-workspace-root)
        (apply #'provided-mode-derived-p major-mode lsp-tailwindcss-major-modes)
        (lsp-tailwindcss--has-config-file)))
