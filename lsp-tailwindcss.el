@@ -278,11 +278,10 @@ When installed from the vscode extension."
   (f-join lsp-server-install-dir "tailwindcss/extension/dist/tailwindServer.js"))
 
 (lsp-dependency 'tailwindcss-language-server
-                `(:download
-                  :url lsp-tailwindcss--download-url
-                  :decompress :zip
-                  :store-path ,(f-join lsp-server-install-dir "tailwindcss" "server")
-                  :binary-path lsp-tailwindcss-server-command))
+                '(:system "tailwindcss-language-server")
+                '(:npm
+                  :package "@tailwindcss/language-server"
+                  :path "tailwindcss-language-server"))
 
 (defun lsp-tailwindcss--has-config-file ()
   "Check if there is a tailwindcss config file exists.
@@ -333,7 +332,7 @@ not work when typing \"-\" in classname."
  (make-lsp-client
   :new-connection (lsp-stdio-connection
                    (lambda ()
-                     `("node" ,(lsp-package-path 'tailwindcss-language-server) "--stdio")))
+                     `(,(lsp-package-path 'tailwindcss-language-server) "--stdio")))
   :activation-fn #'lsp-tailwindcss--activate-p
   :server-id 'tailwindcss
   :priority -1
