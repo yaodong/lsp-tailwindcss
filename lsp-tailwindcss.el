@@ -35,7 +35,7 @@
   "Adds lsp-mode support for tailwindcss."
   :group 'lsp-mode)
 
-(defcustom lsp-tailwindcss-add-on-mode nil
+(defcustom lsp-tailwindcss-add-on-mode t
   "Specify lsp-tailwindcss as add-on so it can work with other language servers."
   :type 'boolean
   :group 'lsp-tailwindcss)
@@ -54,7 +54,7 @@ For example div.bg-red-500.uppercase."
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
 
-(defcustom lsp-tailwindcss-show-pixel-equivalents t
+(defcustom lsp-tailwindcss-show-pixel-equivalents nil
   "Show px equivalents for rem CSS values in completions and hovers."
   :type 'boolean
   :group 'lsp-tailwindcss
