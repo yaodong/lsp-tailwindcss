@@ -40,19 +40,11 @@
   :type 'boolean
   :group 'lsp-tailwindcss)
 
-(defcustom lsp-tailwindcss-major-modes '(rjsx-mode web-mode html-mode css-mode typescript-mode typescript-tsx-mode tsx-ts-mode)
+(defcustom lsp-tailwindcss-major-modes '(web-mode html-mode css-mode rjsx-mode typescript-mode typescript-tsx-mode tsx-ts-mode)
   "Major modes that lsp-tailwindcss should activate."
   :type 'list
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
-
-(defcustom lsp-tailwindcss-skip-config-check nil
-  "Force skip config file check.
-Only use it when your config file are in unconventional location
-and make sure tailwindcss language server can find it."
-  :type 'boolean
-  :group 'lsp-tailwindcss
-  :package-version '(lsp-tailwindcss . "0.3"))
 
 ;;; Language server global settings:
 (defcustom lsp-tailwindcss-emmet-completions nil
@@ -76,7 +68,7 @@ Used to convert rem CSS values to their px equivalents,
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
 
-(defcustom lsp-tailwindcss-validate t
+(defcustom lsp-tailwindcss-validate nil
   "Enable linting.
 Rules can be configured individually using the lsp-tailwindcss-lint-* settings:
   ignore: disable lint rule entirely
@@ -86,7 +78,7 @@ Rules can be configured individually using the lsp-tailwindcss-lint-* settings:
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
 
-(defcustom lsp-tailwindcss-hovers t
+(defcustom lsp-tailwindcss-hovers nil
   "Enable hovers, default: true."
   :type 'boolean
   :group 'lsp-tailwindcss
@@ -98,7 +90,7 @@ Rules can be configured individually using the lsp-tailwindcss-lint-* settings:
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.3"))
 
-(defcustom lsp-tailwindcss-code-actions t
+(defcustom lsp-tailwindcss-code-actions nil
   "Enable code actions, default: true."
   :type 'boolean
   :group 'lsp-tailwindcss
@@ -161,32 +153,9 @@ Which apply the same CSS property or properties."
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.2"))
 
-(defcustom lsp-tailwindcss-experimental-class-regex ""
-  "Custom regex to match tailwindcss classes.
-
-This is a undocumented setting, see https://github.com/tailwindlabs/tailwindcss-intellisense/issues/129"
-  :type 'string
-  :group 'lsp-tailwindcss
-  :package-version '(lsp-tailwindcss . "0.3"))
-
 (defcustom lsp-tailwindcss-class-attributes ["class" "className" "ngClass"]
   "The HTML attributes to provide class completions, hover previews, linting etc."
   :type 'lsp-string-vector
-  :group 'lsp-tailwindcss
-  :package-version '(lsp-tailwindcss . "0.3"))
-
-(defcustom lsp-tailwindcss-experimental-config-file nil
-  "Manually specify the Tailwind config file or files.
-It can be a single string or a hash map. see
-https://github.com/tailwindlabs/tailwindcss-intellisense#tailwindcssexperimentalconfigfile
-Example:
-\(setq lsp-tailwindcss-experimental-config-file \"config/tailwindcss.conf.js\")
-
-\(setq lsp-tailwindcss-experimental-config-file
-      (ht
-       (\"themes/simple/tailwind.config.js\" \"themes/simple/**\")
-       (\"themes/neon/tailwind.config.js\" \"themes/neon/**\")))"
-  :type 'other
   :group 'lsp-tailwindcss
   :package-version '(lsp-tailwindcss . "0.3"))
 
@@ -205,8 +174,6 @@ Example:
    ("tailwindCSS.lint.invalidConfigPath" lsp-tailwindcss-lint-invalid-config-path)
    ("tailwindCSS.lint.cssConflict" lsp-tailwindcss-lint-css-conflict)
    ("tailwindCSS.lint.recommendedVariantOrder" lsp-tailwindcss-lint-recommended-variant-order)
-   ("tailwindCSS.experimental.classRegex" lsp-tailwindcss-experimental-class-regex)
-   ("tailwindCSS.experimental.configFile" lsp-tailwindcss-experimental-config-file)
    ("tailwindCSS.classAttributes" lsp-tailwindcss-class-attributes)))
 ;;; Language server global settings ends here
 
@@ -218,23 +185,10 @@ Example:
 
 (defun lsp-tailwindcss--has-config-file ()
   "Check if there is a tailwindcss config file exists.
-To keep it simple and performant,only check for conventional location.
-see `lsp-tailwindcss-skip-config-check'"
-  (or lsp-tailwindcss-skip-config-check
-      lsp-tailwindcss-experimental-config-file
-      (file-exists-p (f-join (lsp-workspace-root) "tailwind.config.js"))
-      (file-exists-p (f-join (lsp-workspace-root) "config" "tailwind.config.js"))
-      (file-exists-p (f-join (lsp-workspace-root) "assets" "tailwind.config.js"))
-      (locate-dominating-file (buffer-file-name) "tailwind.config.js")
-
-      (file-exists-p (f-join (lsp-workspace-root) "tailwind.config.cjs"))
-      (file-exists-p (f-join (lsp-workspace-root) "config" "tailwind.config.cjs"))
-      (file-exists-p (f-join (lsp-workspace-root) "assets" "tailwind.config.cjs"))
-      (locate-dominating-file (buffer-file-name) "tailwind.config.cjs")
-
+To keep it simple and performant,only check for conventional location."
+  (or (file-exists-p (f-join (lsp-workspace-root) "tailwind.config.js"))
       (file-exists-p (f-join (lsp-workspace-root) "tailwind.config.ts"))
-      (file-exists-p (f-join (lsp-workspace-root) "config" "tailwind.config.ts"))
-      (file-exists-p (f-join (lsp-workspace-root) "assets" "tailwind.config.ts"))
+      (locate-dominating-file (buffer-file-name) "tailwind.config.js")
       (locate-dominating-file (buffer-file-name) "tailwind.config.ts")))
 
 (defun lsp-tailwindcss--activate-p (&rest _args)
